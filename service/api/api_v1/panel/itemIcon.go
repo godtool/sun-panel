@@ -3,6 +3,7 @@ package panel
 import (
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/url"
 	"os"
 	"path"
@@ -141,6 +142,27 @@ func (a *ItemIcon) GetListByGroupId(c *gin.Context) {
 
 	for k, v := range itemIcons {
 		json.Unmarshal([]byte(v.IconJson), &itemIcons[k].Icon)
+
+		u, err := url.Parse(v.Url)
+		if err != nil {
+			apiReturn.ErrorDatabase(c, err.Error())
+			return
+		}
+		oldAddr, oldPort, err := net.SplitHostPort(u.Host)
+		if err != nil {
+			apiReturn.ErrorDatabase(c, err.Error())
+			return
+		}
+
+		if oldAddr == "localhost" {
+			addr, _, err := net.SplitHostPort(c.Request.Host)
+			if err != nil {
+				apiReturn.ErrorDatabase(c, err.Error())
+				return
+			}
+			u.Host = fmt.Sprintf("%s:%s", addr, oldPort)
+			itemIcons[k].Url = u.String()
+		}
 	}
 
 	apiReturn.SuccessListData(c, itemIcons, 0)
