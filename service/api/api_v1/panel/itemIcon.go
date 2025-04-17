@@ -160,7 +160,7 @@ func (a *ItemIcon) GetListByGroupId(c *gin.Context) {
 				apiReturn.ErrorDatabase(c, err.Error())
 				return
 			}
-			u.Host = fmt.Sprintf("%s:%s", addr, oldPort)
+			u.Host = fmt.Sprintf("[%s]:%s", addr, oldPort)
 			itemIcons[k].Url = u.String()
 		}
 	}
