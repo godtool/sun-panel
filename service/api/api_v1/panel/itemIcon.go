@@ -142,23 +142,21 @@ func (a *ItemIcon) GetListByGroupId(c *gin.Context) {
 
 	for k, v := range itemIcons {
 		json.Unmarshal([]byte(v.IconJson), &itemIcons[k].Icon)
+		itemIcons[k].Url = v.Url
 
 		u, err := url.Parse(v.Url)
 		if err != nil {
-			apiReturn.ErrorDatabase(c, err.Error())
-			return
+			continue
 		}
 		oldAddr, oldPort, err := net.SplitHostPort(u.Host)
 		if err != nil {
-			apiReturn.ErrorDatabase(c, err.Error())
-			return
+			continue
 		}
 
 		if oldAddr == "localhost" {
 			addr, _, err := net.SplitHostPort(c.Request.Host)
 			if err != nil {
-				apiReturn.ErrorDatabase(c, err.Error())
-				return
+				continue
 			}
 			ip := net.ParseIP(addr)
 			if ip != nil && ip.To4() == nil {
